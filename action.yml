@@ -1,5 +1,5 @@
 name: "mcp-audprobe"
-description: "Actively test whether an MCP server you own validates bearer-token aud/iss/exp. Only use on servers you own."
+description: "Test that an MCP server you own rejects tokens with wrong aud/iss, no aud, or expired exp. Own servers only."
 author: "bymustfa"
 branding:
   icon: shield
@@ -42,7 +42,7 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: actions/setup-python@v5
+    - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
       with:
         python-version: ${{ inputs.python-version }}
     - name: Install mcp-audprobe

@@ -1,14 +1,36 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "mcp-audprobe"
 version = "0.1.0"
-description = "Active audience (aud) validation tester for bearer-token protected MCP servers you own."
-readme = "README.md"
+description = "Actively test whether an MCP server you own validates bearer-token audience (aud), issuer (iss) and expiry (exp)."
+readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.10"
-license = { text = "MIT" }
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Mustafa ÖZTÜRK" }]
+keywords = [
+  "mcp", "model-context-protocol", "oauth", "jwt", "audience", "aud", "security",
+  "security-testing", "bearer-token", "authorization", "github-action", "ci",
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Information Technology",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Security",
+  "Topic :: Software Development :: Quality Assurance",
+  "Topic :: Software Development :: Testing",
+]
 dependencies = [
   "httpx>=0.27",
   "PyJWT[crypto]>=2.8",
@@ -17,6 +39,14 @@ dependencies = [
   "uvicorn>=0.30",
   "rich>=13",
 ]
+
+[project.urls]
+Homepage = "https://github.com/bymustfa/mcp-audprobe"
+Repository = "https://github.com/bymustfa/mcp-audprobe"
+Issues = "https://github.com/bymustfa/mcp-audprobe/issues"
+Changelog = "https://github.com/bymustfa/mcp-audprobe/blob/main/CHANGELOG.md"
+Documentation = "https://github.com/bymustfa/mcp-audprobe#readme"
+"Security Policy" = "https://github.com/bymustfa/mcp-audprobe/security/policy"
 
 [project.optional-dependencies]
 # The demo servers use the real MCP Python SDK. >=1.30.0 is the first 1.x release with validate_token_resource.

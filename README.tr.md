@@ -1,6 +1,8 @@
-[English](README.md) | **Türkçe**
+[English](https://github.com/bymustfa/mcp-audprobe/blob/main/README.md) | **Türkçe**
 
-[![CI](https://github.com/bymustfa/mcp-audprobe/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/bymustfa/mcp-audprobe/actions/workflows/ci.yml)
+[![CI](https://github.com/bymustfa/mcp-audprobe/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/bymustfa/mcp-audprobe/actions/workflows/ci.yml) [![PyPI](https://img.shields.io/pypi/v/mcp-audprobe)](https://pypi.org/project/mcp-audprobe/) [![CodeQL](https://github.com/bymustfa/mcp-audprobe/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/bymustfa/mcp-audprobe/actions/workflows/codeql.yml) [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/bymustfa/mcp-audprobe/badge)](https://scorecard.dev/viewer/?uri=github.com/bymustfa/mcp-audprobe) [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/bymustfa/mcp-audprobe/blob/main/LICENSE)
+
+![mcp-audprobe demo: vulnerable server FAILs, hardened server PASSes](https://raw.githubusercontent.com/bymustfa/mcp-audprobe/main/docs/demo.gif)
 
 # mcp-audprobe
 
@@ -40,6 +42,16 @@ Bağlam: [X paylaşımı](https://x.com/karlmehta/status/2115834904739033160). "
 gözden kaçırmak kolaydır; bu yüzden CI'da çalıştırabileceğiniz *aktif* bir test gerekir.
 
 ## Kurulum
+
+İlk sürüm PyPI'da yayımlandıktan sonra ([Releases](https://github.com/bymustfa/mcp-audprobe/releases)):
+
+```bash
+pipx install mcp-audprobe       # önerilen: izole CLI   (veya: uvx mcp-audprobe --help)
+pip install mcp-audprobe        # mevcut ortama (Python >= 3.10)
+mcp-audprobe --version
+```
+
+Depoyu klonlayarak (geliştirme):
 
 ```bash
 pip install -e .            # yalnızca CLI (Python >= 3.10)
@@ -98,10 +110,26 @@ Seçenekler: `--json` (tablo yerine stdout'a JSON), `--json-out DOSYA` (hem tabl
 `audprobe-report.json` dosyasını yazar, yetkilendirme sunucusunu durdurur ve FAIL/INCONCLUSIVE durumunda işi
 başarısız kılar. Sunucunuz daha önceki bir adımda loopback üzerinde başlatılmış ve `http://127.0.0.1:9000`
 adresine güvenecek şekilde ayarlanmış olmalıdır (varsayılan `auth-port`). Bkz.
-[`examples/audprobe-workflow.yml`](examples/audprobe-workflow.yml). Girdiler: `url`, `audience`, `auth-port`,
+[`examples/audprobe-workflow.yml`](https://github.com/bymustfa/mcp-audprobe/blob/main/examples/audprobe-workflow.yml). Girdiler: `url`, `audience`, `auth-port`,
 `issuer`, `other-audience`, `json-output`, `allow-remote`, `python-version`; çıktılar: `result`, `report`.
-Action henüz bir marketplace'te yayımlanmadı; bu depodan `uses: bymustfa/mcp-audprobe@main` veya yerel olarak
-`uses: ./` ile kullanabilirsiniz.
+Kullanım:
+
+```yaml
+- name: MCP sunucumu başlat (127.0.0.1:8001, http://127.0.0.1:9000 adresindeki sahte AS'ye güvenir)
+  run: ./start-server.sh
+- uses: bymustfa/mcp-audprobe@v1
+  with:
+    url: http://127.0.0.1:8001/mcp
+    audience: http://127.0.0.1:8001/mcp
+```
+
+> `@v1`, **ilk sürümden sonra** var olan, kayan bir ana sürüm etiketidir (o zamana kadar `@main` veya bir commit
+> SHA'sı kullanın). Tedarik zinciri güvenliği için tam commit SHA'sına sabitlemek de mümkündür:
+> `uses: bymustfa/mcp-audprobe@<sha> # v1.0.0`.
+
+Tam örnek: [`examples/audprobe-workflow.yml`](https://github.com/bymustfa/mcp-audprobe/blob/main/examples/audprobe-workflow.yml).
+Girdilerin ve çıktıların kesin listesi için [`action.yml`](https://github.com/bymustfa/mcp-audprobe/blob/main/action.yml)
+dosyasına bakın.
 
 ## JSON şeması (`schema_version: 1`)
 
@@ -143,7 +171,7 @@ Sahte yetkilendirme sunucusunu ve gerçek MCP Python SDK ile yazılmış iki sun
   `AccessToken.resource` olarak döndürür ve
   `AuthSettings(validate_token_resource=True, resource_server_url=<kendi URL'si>)` ayarlıdır.
 
-![demo](demo/output/demo.png)
+![demo](https://raw.githubusercontent.com/bymustfa/mcp-audprobe/main/demo/output/demo.png)
 
 Beklenen: vulnerable = FAIL (`AUD-OTHER`, `AUD-MISSING` kabul edildi), hardened = PASS. Savunmasız sunucu yine
 de yanlış `iss`'li ve süresi dolmuş token'ları reddeder; bu, AWS bülteninin tarifiyle birebir uyumludur (imza,
@@ -189,9 +217,9 @@ denetlemedim ve yukarıda adı geçen dosyaların dışında bir iddiayı doğru
 
 ## Katkı
 
-[CONTRIBUTING.md](CONTRIBUTING.md), [Davranış Kuralları](CODE_OF_CONDUCT.md) ve [Güvenlik Politikası](SECURITY.md)
+[CONTRIBUTING.md](https://github.com/bymustfa/mcp-audprobe/blob/main/CONTRIBUTING.md), [Davranış Kuralları](https://github.com/bymustfa/mcp-audprobe/blob/main/CODE_OF_CONDUCT.md) ve [Güvenlik Politikası](https://github.com/bymustfa/mcp-audprobe/blob/main/SECURITY.md)
 dosyalarına bakın.
 
 ## Lisans
 
-MIT, bkz. [LICENSE](LICENSE).
+MIT, bkz. [LICENSE](https://github.com/bymustfa/mcp-audprobe/blob/main/LICENSE).
