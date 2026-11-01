@@ -57,4 +57,4 @@ Conventional-Commit PRs to `main` keeps an open "chore(main): release X.Y.Z" PR 
 tag, the GitHub Release and `CHANGELOG.md`, then publishes to PyPI via Trusted Publishing (OIDC, environment
 `pypi`) and moves the floating `v1` tag used by `uses: bymustfa/mcp-audprobe@v1`. Release PRs created with the
 default `GITHUB_TOKEN` do not trigger CI, so required checks do not report on them: merge them as an admin.
-After the first release (1.0.0), delete `"release-as"` from `release-please-config.json`.
+`release-as` was only used to force the first release (1.0.0) and has been removed; versions now follow the commit types.

@@ -123,8 +123,8 @@ Kullanım:
     audience: http://127.0.0.1:8001/mcp
 ```
 
-> `@v1`, **ilk sürümden sonra** var olan, kayan bir ana sürüm etiketidir (o zamana kadar `@main` veya bir commit
-> SHA'sı kullanın). Tedarik zinciri güvenliği için tam commit SHA'sına sabitlemek de mümkündür:
+> `@v1`, her zaman en son `v1.x.y` sürümünü gösteren kayan bir ana sürüm etiketidir.
+> Tedarik zinciri güvenliği için tam commit SHA'sına sabitlemek de mümkündür:
 > `uses: bymustfa/mcp-audprobe@<sha> # v1.0.0`.
 
 Tam örnek: [`examples/audprobe-workflow.yml`](https://github.com/bymustfa/mcp-audprobe/blob/main/examples/audprobe-workflow.yml).

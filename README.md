@@ -114,10 +114,10 @@ started in an earlier step on loopback, trusting `http://127.0.0.1:9000` (defaul
     audience: http://127.0.0.1:8001/mcp
 ```
 
-> `@v1` is a floating major tag that exists **after the first release** (until then use `@main` or a commit SHA).
+> `@v1` is a floating major tag that always points to the latest `v1.x.y` release.
 > For supply-chain safety you can instead pin a full commit SHA: `uses: bymustfa/mcp-audprobe@<sha> # v1.0.0`.
 
-Full example: [`examples/audprobe-workflow.yml`](examples/audprobe-workflow.yml).
+Full example: [`examples/audprobe-workflow.yml`](https://github.com/bymustfa/mcp-audprobe/blob/main/examples/audprobe-workflow.yml).
 
 | Input | Default | Meaning |
 |-------|---------|---------|
