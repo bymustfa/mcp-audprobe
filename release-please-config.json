@@ -6,7 +6,6 @@
       "package-name": "mcp-audprobe",
       "changelog-path": "CHANGELOG.md",
       "include-component-in-tag": false,
-      "release-as": "1.0.0",
       "extra-files": ["src/mcp_audprobe/__init__.py"]
     }
   }
