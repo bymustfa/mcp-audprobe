@@ -26,8 +26,14 @@ def make_client(km, *, check_aud: bool, check_iss=True, check_exp=True, reject_a
             return httpx.Response(401)
         opts = {"verify_aud": check_aud, "verify_iss": check_iss, "verify_exp": check_exp}
         try:
-            jwt.decode(token, km.private_key.public_key(), algorithms=["RS256"], audience=CTX.audience,
-                       issuer=CTX.issuer if check_iss else None, options=opts)
+            jwt.decode(
+                token,
+                km.private_key.public_key(),
+                algorithms=["RS256"],
+                audience=CTX.audience,
+                issuer=CTX.issuer if check_iss else None,
+                options=opts,
+            )
         except jwt.PyJWTError:
             return httpx.Response(401)
         return httpx.Response(200, json={"result": {}})
@@ -76,10 +82,32 @@ def test_network_error_is_inconclusive(km):
 def test_json_schema_keys(km):
     client, _ = make_client(km, check_aud=True)
     res = run_probe("http://127.0.0.1:1/mcp", km, CTX, client=client)
-    assert list(res) == ["schema_version", "tool", "tool_version", "target", "expected_audience", "other_audience",
-                         "issuer", "request", "control", "checks", "summary", "result", "exit_code"]
-    assert list(res["checks"][0]) == ["id", "name", "description", "token_claims", "aud_present", "http_status",
-                                      "outcome", "verdict", "error"]
+    assert list(res) == [
+        "schema_version",
+        "tool",
+        "tool_version",
+        "target",
+        "expected_audience",
+        "other_audience",
+        "issuer",
+        "request",
+        "control",
+        "checks",
+        "summary",
+        "result",
+        "exit_code",
+    ]
+    assert list(res["checks"][0]) == [
+        "id",
+        "name",
+        "description",
+        "token_claims",
+        "aud_present",
+        "http_status",
+        "outcome",
+        "verdict",
+        "error",
+    ]
 
 
 def test_cli_refuses_remote_target(km, tmp_path, capsys):

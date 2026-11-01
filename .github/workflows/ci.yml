@@ -1,12 +1,102 @@
-name: ci
-on: [push, pull_request]
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  test:
+  lint:
+    name: lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: { python-version: "3.12" }
+        with:
+          python-version: "3.12"
+      - run: pip install ruff
+      - run: ruff check .
+      - run: ruff format --check .
+
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
       - run: pip install -e ".[test]"
       - run: pytest -q
-      - run: ./demo/run_demo.sh
+
+  demo:
+    name: demo
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e ".[demo]"
+      - name: Run demo (starts auth server + vulnerable + hardened MCP servers on 127.0.0.1)
+        run: ./demo/run_demo.sh
+      - name: Assert vulnerable=FAIL (exit 1) and hardened=PASS (exit 0)
+        run: |
+          python - <<'PY'
+          import json
+          v = json.load(open("demo/output/vulnerable.json"))
+          h = json.load(open("demo/output/hardened.json"))
+          assert v["result"] == "FAIL" and v["exit_code"] == 1, v["result"]
+          assert {c["id"] for c in v["checks"] if c["verdict"] == "FAIL"} == {"AUD-OTHER", "AUD-MISSING"}
+          assert h["result"] == "PASS" and h["exit_code"] == 0, h["result"]
+          print("demo assertions OK")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: demo-output
+          path: demo/output/
+
+  action-selftest:
+    name: action-selftest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e ".[demo]"
+      - name: Start demo servers on 127.0.0.1 (they fetch JWKS lazily from the action's auth server on :9000)
+        run: |
+          nohup python demo/demo_server.py --mode hardened --port 8002 --issuer http://127.0.0.1:9000 > hardened.log 2>&1 &
+          nohup python demo/demo_server.py --mode vulnerable --port 8001 --issuer http://127.0.0.1:9000 > vulnerable.log 2>&1 &
+          for p in 8001 8002; do
+            for i in $(seq 1 60); do curl -s -o /dev/null --max-time 1 "http://127.0.0.1:$p/mcp" && break; sleep 0.5; done
+          done
+      - name: Action against hardened server (must pass)
+        id: hardened
+        uses: ./
+        with:
+          url: http://127.0.0.1:8002/mcp
+          audience: http://127.0.0.1:8002/mcp
+          json-output: hardened-report.json
+      - name: Action against vulnerable server (must fail)
+        id: vulnerable
+        uses: ./
+        continue-on-error: true
+        with:
+          url: http://127.0.0.1:8001/mcp
+          audience: http://127.0.0.1:8001/mcp
+          json-output: vulnerable-report.json
+      - name: Assert outcomes
+        run: |
+          test "${{ steps.hardened.outputs.result }}" = "PASS"
+          test "${{ steps.vulnerable.outcome }}" = "failure"
+          test "${{ steps.vulnerable.outputs.result }}" = "FAIL"

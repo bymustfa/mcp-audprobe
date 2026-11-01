@@ -10,7 +10,13 @@ from rich.console import Console
 from rich.table import Table
 from rich.text import Text
 
-STYLE = {"PASS": "bold green", "FAIL": "bold red", "ERROR": "bold yellow", "SKIPPED": "dim", "INCONCLUSIVE": "bold yellow"}
+STYLE = {
+    "PASS": "bold green",
+    "FAIL": "bold red",
+    "ERROR": "bold yellow",
+    "SKIPPED": "dim",
+    "INCONCLUSIVE": "bold yellow",
+}
 
 
 def make_console(*, no_color: bool = False, width: int | None = None, **kw: Any) -> Console:
@@ -54,8 +60,12 @@ def render_table(result: dict[str, Any], console: Console) -> None:
         if c["id"] == "EXP-EXPIRED":
             sent = "exp = 1h ago"
         http = "-" if c["http_status"] is None else str(c["http_status"])
-        outcome = {"accepted": "accepted", "rejected": "rejected", "unexpected": "unexpected", None: "not sent"}[c["outcome"]]
-        t.add_row(f"{c['id']}\n[dim]{c['name']}[/dim]", sent, http, outcome, Text(c["verdict"], style=STYLE[c["verdict"]]))
+        outcome = {"accepted": "accepted", "rejected": "rejected", "unexpected": "unexpected", None: "not sent"}[
+            c["outcome"]
+        ]
+        t.add_row(
+            f"{c['id']}\n[dim]{c['name']}[/dim]", sent, http, outcome, Text(c["verdict"], style=STYLE[c["verdict"]])
+        )
     console.print(t)
     s = result["summary"]
     console.print(

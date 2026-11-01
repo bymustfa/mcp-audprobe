@@ -41,12 +41,44 @@ def env(tmp_path_factory):
     as_port, v_port, h_port = free_port(), free_port(), free_port()
     issuer = f"http://127.0.0.1:{as_port}"
     procs = [
-        subprocess.Popen([sys.executable, "-m", "mcp_audprobe", "auth-server", "--port", str(as_port),
-                          "--issuer", issuer, "--key-file", str(key)]),
-        subprocess.Popen([sys.executable, str(ROOT / "demo/demo_server.py"), "--mode", "vulnerable",
-                          "--port", str(v_port), "--issuer", issuer]),
-        subprocess.Popen([sys.executable, str(ROOT / "demo/demo_server.py"), "--mode", "hardened",
-                          "--port", str(h_port), "--issuer", issuer]),
+        subprocess.Popen(
+            [
+                sys.executable,
+                "-m",
+                "mcp_audprobe",
+                "auth-server",
+                "--port",
+                str(as_port),
+                "--issuer",
+                issuer,
+                "--key-file",
+                str(key),
+            ]
+        ),
+        subprocess.Popen(
+            [
+                sys.executable,
+                str(ROOT / "demo/demo_server.py"),
+                "--mode",
+                "vulnerable",
+                "--port",
+                str(v_port),
+                "--issuer",
+                issuer,
+            ]
+        ),
+        subprocess.Popen(
+            [
+                sys.executable,
+                str(ROOT / "demo/demo_server.py"),
+                "--mode",
+                "hardened",
+                "--port",
+                str(h_port),
+                "--issuer",
+                issuer,
+            ]
+        ),
     ]
     try:
         wait(f"{issuer}/health")
@@ -63,8 +95,23 @@ def env(tmp_path_factory):
 def probe(env, port, capsys):
     url = f"http://127.0.0.1:{port}/mcp"
     out = env["dir"] / f"{port}.json"
-    rc = main(["probe", url, "--audience", url, "--issuer", env["issuer"], "--auth-server", env["issuer"],
-               "--key-file", str(env["key"]), "--json-out", str(out), "--no-color"])
+    rc = main(
+        [
+            "probe",
+            url,
+            "--audience",
+            url,
+            "--issuer",
+            env["issuer"],
+            "--auth-server",
+            env["issuer"],
+            "--key-file",
+            str(env["key"]),
+            "--json-out",
+            str(out),
+            "--no-color",
+        ]
+    )
     return rc, json.loads(out.read_text()), capsys.readouterr().out
 
 
@@ -77,7 +124,11 @@ def test_vulnerable_server_fails(env, capsys):
     rc, res, out = probe(env, env["v"], capsys)
     assert rc == 1 and res["result"] == "FAIL"
     assert {c["id"]: c["verdict"] for c in res["checks"]} == {
-        "AUD-OTHER": "FAIL", "AUD-MISSING": "FAIL", "ISS-WRONG": "PASS", "EXP-EXPIRED": "PASS"}
+        "AUD-OTHER": "FAIL",
+        "AUD-MISSING": "FAIL",
+        "ISS-WRONG": "PASS",
+        "EXP-EXPIRED": "PASS",
+    }
     assert "FAIL" in out and "accepted" in out
 
 
@@ -97,7 +148,18 @@ def test_json_flag_prints_json(env, capsys):
 def test_wrong_audience_expectation_is_inconclusive(env, capsys):
     # control token minted for an audience the hardened server does not serve -> control rejected
     url = f"http://127.0.0.1:{env['h']}/mcp"
-    rc = main(["probe", url, "--audience", "http://127.0.0.1:1/not-me", "--issuer", env["issuer"],
-               "--key-file", str(env["key"]), "--json"])
+    rc = main(
+        [
+            "probe",
+            url,
+            "--audience",
+            "http://127.0.0.1:1/not-me",
+            "--issuer",
+            env["issuer"],
+            "--key-file",
+            str(env["key"]),
+            "--json",
+        ]
+    )
     res = json.loads(capsys.readouterr().out)
     assert rc == 2 and res["result"] == "INCONCLUSIVE" and res["control"]["accepted"] is False

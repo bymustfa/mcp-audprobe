@@ -24,7 +24,9 @@ SIZE, PAD, COLS = 17, 28, 110
 
 def main(argv: list[str]) -> int:
     *jsons, out = argv
-    console = make_console(width=COLS, record=True, force_terminal=True, color_system="truecolor", file=open("/dev/null", "w"))
+    console = make_console(
+        width=COLS, record=True, force_terminal=True, color_system="truecolor", file=open("/dev/null", "w")
+    )
     for i, j in enumerate(jsons):
         console.print(f"[bold cyan]$ mcp-audprobe probe --audience <url> <{Path(j).stem} server>[/bold cyan]")
         render_table(json.loads(Path(j).read_text()), console)

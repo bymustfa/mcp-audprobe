@@ -23,18 +23,18 @@ class KeyMaterial:
     private_key: rsa.RSAPrivateKey
 
     @classmethod
-    def generate(cls, bits: int = 2048) -> "KeyMaterial":
+    def generate(cls, bits: int = 2048) -> KeyMaterial:
         return cls(rsa.generate_private_key(public_exponent=65537, key_size=bits))
 
     @classmethod
-    def load(cls, path: str | Path) -> "KeyMaterial":
+    def load(cls, path: str | Path) -> KeyMaterial:
         key = serialization.load_pem_private_key(Path(path).read_bytes(), password=None)
         if not isinstance(key, rsa.RSAPrivateKey):
             raise ValueError(f"{path}: not an RSA private key")
         return cls(key)
 
     @classmethod
-    def load_or_create(cls, path: str | Path) -> "KeyMaterial":
+    def load_or_create(cls, path: str | Path) -> KeyMaterial:
         p = Path(path)
         if p.exists():
             return cls.load(p)

@@ -1,7 +1,17 @@
 import pytest
 
 from mcp_audprobe.checks import (
-    ACCEPTED, ATTACKS, CONTROL, REJECTED, UNEXPECTED, Context, Verdict, attack_verdict, classify, control_ok, overall,
+    ACCEPTED,
+    ATTACKS,
+    CONTROL,
+    REJECTED,
+    UNEXPECTED,
+    Context,
+    Verdict,
+    attack_verdict,
+    classify,
+    control_ok,
+    overall,
 )
 
 CTX = Context(issuer="http://iss", audience="http://me/mcp", other_audience="http://other/mcp")
@@ -9,8 +19,17 @@ CTX = Context(issuer="http://iss", audience="http://me/mcp", other_audience="htt
 
 @pytest.mark.parametrize(
     "status,outcome",
-    [(200, ACCEPTED), (202, ACCEPTED), (401, REJECTED), (403, REJECTED), (400, UNEXPECTED), (404, UNEXPECTED),
-     (500, UNEXPECTED), (302, UNEXPECTED), (None, UNEXPECTED)],
+    [
+        (200, ACCEPTED),
+        (202, ACCEPTED),
+        (401, REJECTED),
+        (403, REJECTED),
+        (400, UNEXPECTED),
+        (404, UNEXPECTED),
+        (500, UNEXPECTED),
+        (302, UNEXPECTED),
+        (None, UNEXPECTED),
+    ],
 )
 def test_classify(status, outcome):
     assert classify(status) == outcome

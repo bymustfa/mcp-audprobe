@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from collections.abc import Callable
+from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Callable
+from typing import Any
 
 from .tokens import build_claims
 
@@ -82,9 +83,24 @@ ATTACKS: tuple[Check, ...] = (
         "Valid signature/iss/exp but aud is a different service. Must be rejected.",
         _other_aud,
     ),
-    Check("AUD-MISSING", "Token without aud", "Valid signature/iss/exp but no aud claim at all. Must be rejected.", _no_aud),
-    Check("ISS-WRONG", "Wrong issuer", "Valid signature and aud, but iss is not the trusted issuer. Must be rejected.", _wrong_iss),
-    Check("EXP-EXPIRED", "Expired token", "Valid signature/iss/aud but exp is one hour in the past. Must be rejected.", _expired),
+    Check(
+        "AUD-MISSING",
+        "Token without aud",
+        "Valid signature/iss/exp but no aud claim at all. Must be rejected.",
+        _no_aud,
+    ),
+    Check(
+        "ISS-WRONG",
+        "Wrong issuer",
+        "Valid signature and aud, but iss is not the trusted issuer. Must be rejected.",
+        _wrong_iss,
+    ),
+    Check(
+        "EXP-EXPIRED",
+        "Expired token",
+        "Valid signature/iss/aud but exp is one hour in the past. Must be rejected.",
+        _expired,
+    ),
 )
 
 
