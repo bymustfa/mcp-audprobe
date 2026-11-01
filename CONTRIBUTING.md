@@ -39,7 +39,9 @@ CI runs the same steps (`lint`, `test`, `demo`, `action-selftest`) and they must
    `src/mcp_audprobe/checks.py`).
 3. If you change the CLI, JSON output or checks, update both `README.md` and `README.tr.md`. The JSON schema is
    versioned (`schema_version`); do not change existing fields without bumping it.
-4. Use clear commit messages in the imperative mood ("Add X", "Fix Y").
+4. Use [Conventional Commits](https://www.conventionalcommits.org/) for the PR title (it becomes the squash-commit
+   subject): `feat: ...`, `fix: ...`, `docs: ...`, `chore: ...`; add `!` for breaking changes. Releases and the
+   changelog are generated from these by release-please.
 
 ## Reporting bugs and ideas
 
@@ -47,3 +49,12 @@ Use the issue templates. For **security problems in mcp-audprobe itself**, do no
 [SECURITY.md](SECURITY.md).
 
 By contributing you agree that your contributions are licensed under the [MIT License](LICENSE).
+
+## Releases (maintainers)
+
+Releases are automated with [release-please](https://github.com/googleapis/release-please): merging
+Conventional-Commit PRs to `main` keeps an open "chore(main): release X.Y.Z" PR up to date; merging it creates the
+tag, the GitHub Release and `CHANGELOG.md`, then publishes to PyPI via Trusted Publishing (OIDC, environment
+`pypi`) and moves the floating `v1` tag used by `uses: bymustfa/mcp-audprobe@v1`. Release PRs created with the
+default `GITHUB_TOKEN` do not trigger CI, so required checks do not report on them: merge them as an admin.
+After the first release (1.0.0), delete `"release-as"` from `release-please-config.json`.

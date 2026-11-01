@@ -1,6 +1,8 @@
-[**English**](README.md) | [Türkçe](README.tr.md)
+[**English**](https://github.com/bymustfa/mcp-audprobe/blob/main/README.md) | [Türkçe](https://github.com/bymustfa/mcp-audprobe/blob/main/README.tr.md)
 
-[![CI](https://github.com/bymustfa/mcp-audprobe/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/bymustfa/mcp-audprobe/actions/workflows/ci.yml)
+[![CI](https://github.com/bymustfa/mcp-audprobe/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/bymustfa/mcp-audprobe/actions/workflows/ci.yml) [![PyPI](https://img.shields.io/pypi/v/mcp-audprobe)](https://pypi.org/project/mcp-audprobe/) [![CodeQL](https://github.com/bymustfa/mcp-audprobe/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/bymustfa/mcp-audprobe/actions/workflows/codeql.yml) [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/bymustfa/mcp-audprobe/badge)](https://scorecard.dev/viewer/?uri=github.com/bymustfa/mcp-audprobe) [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/bymustfa/mcp-audprobe/blob/main/LICENSE)
+
+![mcp-audprobe demo: vulnerable server FAILs, hardened server PASSes](https://raw.githubusercontent.com/bymustfa/mcp-audprobe/main/docs/demo.gif)
 
 # mcp-audprobe
 
@@ -38,6 +40,16 @@ Context: [thread](https://x.com/karlmehta/status/2115834904739033160). A config 
 you set it" is easy to miss, hence an *active* test that you can run in CI.
 
 ## Install
+
+Once the first release is on PyPI (see [Releases](https://github.com/bymustfa/mcp-audprobe/releases)):
+
+```bash
+pipx install mcp-audprobe       # recommended: isolated CLI   (or: uvx mcp-audprobe --help)
+pip install mcp-audprobe        # into the current environment (Python >= 3.10)
+mcp-audprobe --version
+```
+
+From a clone (development):
 
 ```bash
 pip install -e .            # CLI only (Python >= 3.10)
@@ -92,9 +104,34 @@ Options: `--json` (JSON on stdout instead of the table), `--json-out FILE` (tabl
 `action.yml` (composite) installs the tool, starts the fake auth server in the background, probes, writes
 `audprobe-report.json`, stops the auth server, and fails the job on FAIL/INCONCLUSIVE. Your server must be
 started in an earlier step on loopback, trusting `http://127.0.0.1:9000` (default `auth-port`).
-See [`examples/audprobe-workflow.yml`](examples/audprobe-workflow.yml). Inputs: `url`, `audience`, `auth-port`,
-`issuer`, `other-audience`, `json-output`, `allow-remote`, `python-version`; outputs: `result`, `report`.
-Not published to the Marketplace; use it from this repo with `uses: bymustfa/mcp-audprobe@main` (or `uses: ./` inside a checkout of it).
+
+```yaml
+- name: Start my MCP server (127.0.0.1:8001, trusts the fake AS at http://127.0.0.1:9000)
+  run: ./start-server.sh
+- uses: bymustfa/mcp-audprobe@v1
+  with:
+    url: http://127.0.0.1:8001/mcp
+    audience: http://127.0.0.1:8001/mcp
+```
+
+> `@v1` is a floating major tag that exists **after the first release** (until then use `@main` or a commit SHA).
+> For supply-chain safety you can instead pin a full commit SHA: `uses: bymustfa/mcp-audprobe@<sha> # v1.0.0`.
+
+Full example: [`examples/audprobe-workflow.yml`](examples/audprobe-workflow.yml).
+
+| Input | Default | Meaning |
+|-------|---------|---------|
+| `url` (required) | | MCP endpoint of **your** server, e.g. `http://127.0.0.1:8001/mcp` |
+| `audience` (required) | | audience/resource the server must accept (usually its own URL) |
+| `auth-port` | `9000` | port for the fake authorization server |
+| `issuer` | `http://127.0.0.1:<auth-port>` | issuer your server trusts |
+| `other-audience` | `https://other-service.example/mcp` | audience for the wrong-audience token |
+| `json-output` | `audprobe-report.json` | path for the JSON report |
+| `allow-remote` | `false` | allow a non-loopback target (own staging only) |
+| `python-version` | `3.12` | Python used to run the tool |
+
+Outputs: `result` (`PASS`/`FAIL`/`INCONCLUSIVE`) and `report` (path of the JSON report). Check
+[`action.yml`](https://github.com/bymustfa/mcp-audprobe/blob/main/action.yml) for the authoritative list.
 
 ## JSON schema (`schema_version: 1`)
 
@@ -134,7 +171,7 @@ probes both, saves everything to `demo/output/` (`*.txt`, `*.json`, `demo.png`),
 - **hardened**: same verifier, but `verify_token()` returns the token's `aud` as `AccessToken.resource` and
   `AuthSettings(validate_token_resource=True, resource_server_url=<its own URL>)`.
 
-![demo](demo/output/demo.png)
+![demo](https://raw.githubusercontent.com/bymustfa/mcp-audprobe/main/demo/output/demo.png)
 
 Expected: vulnerable = FAIL (`AUD-OTHER`, `AUD-MISSING` accepted), hardened = PASS. The vulnerable server still
 rejects wrong-`iss` and expired tokens: exactly the AWS advisory's description (signature, issuer and expiry
@@ -177,9 +214,9 @@ authgent's own SDK middleware, nor verify claims beyond the files named above; i
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md), the [Code of Conduct](CODE_OF_CONDUCT.md) and the
-[Security Policy](SECURITY.md). Türkçe: [README.tr.md](README.tr.md).
+See [CONTRIBUTING.md](https://github.com/bymustfa/mcp-audprobe/blob/main/CONTRIBUTING.md), the [Code of Conduct](https://github.com/bymustfa/mcp-audprobe/blob/main/CODE_OF_CONDUCT.md) and the
+[Security Policy](https://github.com/bymustfa/mcp-audprobe/blob/main/SECURITY.md). Türkçe: [README.tr.md](https://github.com/bymustfa/mcp-audprobe/blob/main/README.tr.md).
 
 ## License
 
-MIT, see [LICENSE](LICENSE).
+MIT, see [LICENSE](https://github.com/bymustfa/mcp-audprobe/blob/main/LICENSE).
