@@ -16,7 +16,7 @@ jobs:
           nohup python server.py --port 8001 --issuer http://127.0.0.1:9000 \
             --jwks-url http://127.0.0.1:9000/.well-known/jwks.json > server.log 2>&1 &
           sleep 3
-      - uses: bymustfa/mcp-audprobe@v0   # tag/ref of your choice; not published yet
+      - uses: bymustfa/mcp-audprobe@main   # or pin a commit SHA
         with:
           url: http://127.0.0.1:8001/mcp
           audience: http://127.0.0.1:8001/mcp

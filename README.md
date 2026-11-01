@@ -1,3 +1,7 @@
+[**English**](README.md) | [Türkçe](README.tr.md)
+
+[![CI](https://github.com/bymustfa/mcp-audprobe/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/bymustfa/mcp-audprobe/actions/workflows/ci.yml)
+
 # mcp-audprobe
 
 Actively test whether an **MCP server you own** really validates the bearer token's audience (`aud`),
@@ -37,8 +41,8 @@ you set it" is easy to miss, hence an *active* test that you can run in CI.
 
 ```bash
 pip install -e .            # CLI only (Python >= 3.10)
-pip install -e ".[demo]"    # + MCP Python SDK (>=1.30.0) and Pillow, for the demo servers / PNG
-pip install -e ".[test]"    # + pytest
+pip install -e ".[demo]"    # + MCP Python SDK (>=1.30.0,<2) and Pillow, for the demo servers / PNG
+pip install -e ".[test]"    # + pytest, ruff
 ```
 
 ## How it works
@@ -90,7 +94,7 @@ Options: `--json` (JSON on stdout instead of the table), `--json-out FILE` (tabl
 started in an earlier step on loopback, trusting `http://127.0.0.1:9000` (default `auth-port`).
 See [`examples/audprobe-workflow.yml`](examples/audprobe-workflow.yml). Inputs: `url`, `audience`, `auth-port`,
 `issuer`, `other-audience`, `json-output`, `allow-remote`, `python-version`; outputs: `result`, `report`.
-Not published anywhere yet. Until it is, reference it by a local path (`uses: ./`) in a repo that contains it.
+Not published to the Marketplace; use it from this repo with `uses: bymustfa/mcp-audprobe@main` (or `uses: ./` inside a checkout of it).
 
 ## JSON schema (`schema_version: 1`)
 
@@ -151,7 +155,7 @@ tests, and an end-to-end test against both demo servers).
 - The wrong-`iss` token uses the trusted key, so it tests the `iss` comparison, not key/issuer binding.
 - Uses `initialize` only. Servers that enforce auth later (per tool call) or need sessions may need more.
 - Clock skew leeway on the server is not probed (expired token is 1 h old).
-- Demo servers are for demonstration, not production templates. Developed against `mcp` 1.30.0.
+- Demo servers are for demonstration, not production templates. Developed against `mcp` 1.30.0; the demo servers use the 1.x `FastMCP` API (`mcp>=1.30.0,<2`; `mcp` 2.x renamed it and is not supported by the demo yet).
 
 ## Comparison with authgent
 
@@ -170,6 +174,11 @@ audience, which is the failure in the two advisories above. The tools are comple
 metadata/spec conformance of a (possibly remote) server and also ships an AS and SDKs; mcp-audprobe is a narrow
 black-box test of token validation on servers you run locally with a throwaway fake issuer. (I did not audit
 authgent's own SDK middleware, nor verify claims beyond the files named above; its behaviour may change.)
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md), the [Code of Conduct](CODE_OF_CONDUCT.md) and the
+[Security Policy](SECURITY.md). Türkçe: [README.tr.md](README.tr.md).
 
 ## License
 

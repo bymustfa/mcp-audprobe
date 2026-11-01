@@ -1,0 +1,50 @@
+name: Bug report
+description: Something does not work as documented
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! **Only report results from servers you own or are authorized to test.**
+        Security problems in mcp-audprobe itself: please use private vulnerability reporting, not this form.
+  - type: checkboxes
+    id: authorized
+    attributes:
+      label: Authorization
+      options:
+        - label: I only ran mcp-audprobe against a server I own or am authorized to test.
+          required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: Include what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Exact commands, and the server/SDK involved (e.g. `mcp` version, `validate_token_resource` setting).
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Output / JSON report
+      description: Paste the table or `--json` output. Tokens are never printed, but redact hostnames if needed.
+      render: json
+  - type: input
+    id: version
+    attributes:
+      label: mcp-audprobe version
+      placeholder: "0.1.0 (mcp-audprobe --version)"
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Python / OS
+      placeholder: "Python 3.12, Ubuntu 24.04"

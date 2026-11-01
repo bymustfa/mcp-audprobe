@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability in mcp-audprobe (private)
+    url: https://github.com/bymustfa/mcp-audprobe/security/advisories/new
+    about: Please do not open public issues for security problems. Use GitHub private vulnerability reporting.
