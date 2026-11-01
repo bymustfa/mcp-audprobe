@@ -41,7 +41,7 @@ you set it" is easy to miss, hence an *active* test that you can run in CI.
 
 ## Install
 
-Once the first release is on PyPI (see [Releases](https://github.com/bymustfa/mcp-audprobe/releases)):
+Available on [PyPI](https://pypi.org/project/mcp-audprobe/) (release notes: [Releases](https://github.com/bymustfa/mcp-audprobe/releases)):
 
 ```bash
 pipx install mcp-audprobe       # recommended: isolated CLI   (or: uvx mcp-audprobe --help)
