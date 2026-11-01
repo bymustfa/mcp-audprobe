@@ -50,8 +50,8 @@ Documentation = "https://github.com/bymustfa/mcp-audprobe#readme"
 
 [project.optional-dependencies]
 # The demo servers use the real MCP Python SDK. >=1.30.0 is the first 1.x release with validate_token_resource.
-demo = ["mcp>=1.30.0,<2", "pillow>=10"]
-test = ["pytest>=8", "mcp>=1.30.0,<2", "pillow>=10", "ruff>=0.5"]
+demo = ["mcp>=1.30.0,<3", "pillow>=10"]
+test = ["pytest>=8", "mcp>=1.30.0,<3", "pillow>=10", "ruff>=0.5"]
 
 [project.scripts]
 mcp-audprobe = "mcp_audprobe.cli:main"
