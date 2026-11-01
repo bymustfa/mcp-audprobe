@@ -43,7 +43,7 @@ gözden kaçırmak kolaydır; bu yüzden CI'da çalıştırabileceğiniz *aktif*
 
 ## Kurulum
 
-İlk sürüm PyPI'da yayımlandıktan sonra ([Releases](https://github.com/bymustfa/mcp-audprobe/releases)):
+[PyPI](https://pypi.org/project/mcp-audprobe/) üzerinde mevcut (sürüm notları: [Releases](https://github.com/bymustfa/mcp-audprobe/releases)):
 
 ```bash
 pipx install mcp-audprobe       # önerilen: izole CLI   (veya: uvx mcp-audprobe --help)
