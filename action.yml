@@ -1,0 +1,83 @@
+name: "mcp-audprobe"
+description: "Actively test whether an MCP server you own validates bearer-token aud/iss/exp. Only use on servers you own."
+author: "bymustfa"
+branding:
+  icon: shield
+  color: red
+
+inputs:
+  url:
+    description: "MCP endpoint URL of the server under test (must be a server you own; loopback by default)."
+    required: true
+  audience:
+    description: "Audience/resource the server must accept (usually the server's own URL)."
+    required: true
+  auth-port:
+    description: "Port for the local fake authorization server started by this action."
+    default: "9000"
+  issuer:
+    description: "Issuer your server trusts. Defaults to http://127.0.0.1:<auth-port>."
+    default: ""
+  other-audience:
+    description: "Audience for the wrong-audience token."
+    default: "https://other-service.example/mcp"
+  json-output:
+    description: "Path to write the JSON report to."
+    default: "audprobe-report.json"
+  allow-remote:
+    description: "Set to 'true' to allow non-loopback targets you own / are authorized to test."
+    default: "false"
+  python-version:
+    description: "Python version used to run mcp-audprobe."
+    default: "3.12"
+
+outputs:
+  result:
+    description: "PASS, FAIL or INCONCLUSIVE"
+    value: ${{ steps.probe.outputs.result }}
+  report:
+    description: "Path to the JSON report"
+    value: ${{ inputs.json-output }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+    - name: Install mcp-audprobe
+      shell: bash
+      run: python -m pip install --quiet "${{ github.action_path }}"
+    - name: Start fake authorization server
+      shell: bash
+      run: |
+        KEY="${RUNNER_TEMP}/audprobe-key.pem"
+        ISSUER="${{ inputs.issuer }}"
+        [ -n "$ISSUER" ] || ISSUER="http://127.0.0.1:${{ inputs.auth-port }}"
+        echo "AUDPROBE_KEY=$KEY" >> "$GITHUB_ENV"
+        echo "AUDPROBE_ISSUER=$ISSUER" >> "$GITHUB_ENV"
+        nohup mcp-audprobe auth-server --port "${{ inputs.auth-port }}" --issuer "$ISSUER" --key-file "$KEY" \
+          > "${RUNNER_TEMP}/audprobe-as.log" 2>&1 &
+        echo $! > "${RUNNER_TEMP}/audprobe-as.pid"
+        for i in $(seq 1 40); do
+          curl -fsS "http://127.0.0.1:${{ inputs.auth-port }}/health" >/dev/null 2>&1 && exit 0; sleep 0.25
+        done
+        cat "${RUNNER_TEMP}/audprobe-as.log"; exit 2
+    - name: Probe
+      id: probe
+      shell: bash
+      run: |
+        set +e
+        EXTRA=""
+        [ "${{ inputs.allow-remote }}" = "true" ] && EXTRA="--allow-remote"
+        mcp-audprobe probe "${{ inputs.url }}" \
+          --audience "${{ inputs.audience }}" \
+          --issuer "$AUDPROBE_ISSUER" \
+          --key-file "$AUDPROBE_KEY" \
+          --other-audience "${{ inputs.other-audience }}" \
+          --json-out "${{ inputs.json-output }}" $EXTRA
+        rc=$?
+        case $rc in 0) r=PASS;; 1) r=FAIL;; *) r=INCONCLUSIVE;; esac
+        echo "result=$r" >> "$GITHUB_OUTPUT"
+        kill "$(cat "${RUNNER_TEMP}/audprobe-as.pid")" 2>/dev/null
+        exit $rc

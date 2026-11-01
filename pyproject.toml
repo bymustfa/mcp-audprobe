@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mcp-audprobe"
+version = "0.1.0"
+description = "Active audience (aud) validation tester for bearer-token protected MCP servers you own."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+  "httpx>=0.27",
+  "PyJWT[crypto]>=2.8",
+  "cryptography>=42",
+  "starlette>=0.37",
+  "uvicorn>=0.30",
+  "rich>=13",
+]
+
+[project.optional-dependencies]
+# The demo servers use the real MCP Python SDK. >=1.30.0 is the first 1.x release with validate_token_resource.
+demo = ["mcp>=1.30.0", "pillow>=10"]
+test = ["pytest>=8", "mcp>=1.30.0", "pillow>=10"]
+
+[project.scripts]
+mcp-audprobe = "mcp_audprobe.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

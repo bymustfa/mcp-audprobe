@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "tool": "mcp-audprobe",
+  "tool_version": "0.1.0",
+  "target": "http://127.0.0.1:18002/mcp",
+  "expected_audience": "http://127.0.0.1:18002/mcp",
+  "other_audience": "https://other-service.example/mcp",
+  "issuer": "http://127.0.0.1:19000",
+  "request": "POST initialize (JSON-RPC) with Authorization: Bearer <token>",
+  "control": {
+    "id": "CONTROL",
+    "name": "Valid control token",
+    "description": "Correct iss, aud, signature and expiry. Must be accepted, otherwise the run is inconclusive.",
+    "token_claims": {
+      "iss": "http://127.0.0.1:19000",
+      "aud": "http://127.0.0.1:18002/mcp",
+      "exp": 1793541426
+    },
+    "aud_present": true,
+    "http_status": 200,
+    "outcome": "accepted",
+    "error": null,
+    "accepted": true
+  },
+  "checks": [
+    {
+      "id": "AUD-OTHER",
+      "name": "Token for another audience",
+      "description": "Valid signature/iss/exp but aud is a different service. Must be rejected.",
+      "token_claims": {
+        "iss": "http://127.0.0.1:19000",
+        "aud": "https://other-service.example/mcp",
+        "exp": 1793541426
+      },
+      "aud_present": true,
+      "http_status": 401,
+      "outcome": "rejected",
+      "verdict": "PASS",
+      "error": null
+    },
+    {
+      "id": "AUD-MISSING",
+      "name": "Token without aud",
+      "description": "Valid signature/iss/exp but no aud claim at all. Must be rejected.",
+      "token_claims": {
+        "iss": "http://127.0.0.1:19000",
+        "exp": 1793541426
+      },
+      "aud_present": false,
+      "http_status": 401,
+      "outcome": "rejected",
+      "verdict": "PASS",
+      "error": null
+    },
+    {
+      "id": "ISS-WRONG",
+      "name": "Wrong issuer",
+      "description": "Valid signature and aud, but iss is not the trusted issuer. Must be rejected.",
+      "token_claims": {
+        "iss": "http://127.0.0.1:19000/evil-issuer",
+        "aud": "http://127.0.0.1:18002/mcp",
+        "exp": 1793541426
+      },
+      "aud_present": true,
+      "http_status": 401,
+      "outcome": "rejected",
+      "verdict": "PASS",
+      "error": null
+    },
+    {
+      "id": "EXP-EXPIRED",
+      "name": "Expired token",
+      "description": "Valid signature/iss/aud but exp is one hour in the past. Must be rejected.",
+      "token_claims": {
+        "iss": "http://127.0.0.1:19000",
+        "aud": "http://127.0.0.1:18002/mcp",
+        "exp": 1793537226
+      },
+      "aud_present": true,
+      "http_status": 401,
+      "outcome": "rejected",
+      "verdict": "PASS",
+      "error": null
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "result": "PASS",
+  "exit_code": 0
+}

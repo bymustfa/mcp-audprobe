@@ -1,0 +1,18 @@
+mcp-audprobe 0.1.0  target: http://127.0.0.1:18001/mcp
+expected aud: http://127.0.0.1:18001/mcp   trusted iss: http://127.0.0.1:19000
+control token: accepted (HTTP 200)
+                                                                                                        
+  Check                        Token sent                                 HTTP   Server       Verdict   
+ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 
+  AUD-OTHER                    aud=https://other-service.example/mcp       200   accepted     FAIL      
+  Token for another audience                                                                            
+  AUD-MISSING                  aud=(none)                                  200   accepted     FAIL      
+  Token without aud                                                                                     
+  ISS-WRONG                    iss=127.0.0.1:19000/evil-issuer             401   rejected     PASS      
+  Wrong issuer                                                                                          
+  EXP-EXPIRED                  exp = 1h ago                                401   rejected     PASS      
+  Expired token                                                                                         
+                                                                                                        
+RESULT: FAIL   passed=2 failed=2 errors=0 skipped=0
+Server accepted tokens it should have rejected: AUD-OTHER, AUD-MISSING
+(exit code: 1)

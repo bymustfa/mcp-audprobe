@@ -1,0 +1,25 @@
+# Example: gate CI on audience validation of your own MCP server.
+# Copy to .github/workflows/audprobe.yml in YOUR repo. The server under test must trust the fake
+# authorization server's JWKS: http://127.0.0.1:9000/.well-known/jwks.json (issuer http://127.0.0.1:9000).
+name: mcp-audprobe
+on: [pull_request]
+jobs:
+  aud-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: Start my MCP server (listens on 127.0.0.1:8001, trusts the fake AS)
+        run: |
+          pip install -r requirements.txt
+          nohup python server.py --port 8001 --issuer http://127.0.0.1:9000 \
+            --jwks-url http://127.0.0.1:9000/.well-known/jwks.json > server.log 2>&1 &
+          sleep 3
+      - uses: bymustfa/mcp-audprobe@v0   # tag/ref of your choice; not published yet
+        with:
+          url: http://127.0.0.1:8001/mcp
+          audience: http://127.0.0.1:8001/mcp
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: audprobe-report, path: audprobe-report.json }
