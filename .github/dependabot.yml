@@ -7,6 +7,10 @@ updates:
     commit-message:
       prefix: "chore(deps)"
     open-pull-requests-limit: 5
+    ignore:
+      # mcp 2.x renamed FastMCP to MCPServer; the demo servers are pinned to <2 until issue #4 is done.
+      - dependency-name: "mcp"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: github-actions
     directory: /
     schedule:
