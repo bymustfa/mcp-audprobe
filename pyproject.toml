@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mcp-audprobe"
-version = "0.1.0"
+version = "1.0.0"
 description = "Actively test whether an MCP server you own validates bearer-token audience (aud), issuer (iss) and expiry (exp)."
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.10"
